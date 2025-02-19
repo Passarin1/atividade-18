@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());                      // Middleware para parsing JSON
 
 // Rota raiz
-app.get("/", (_req, res) => {
+app.get("/", ( req, res) => {
   console.log("Rota GET/ solicitada");
   res.json({
     nome: "Luis Henrique",                   // Substitua pelo seu nome
