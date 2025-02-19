@@ -9,9 +9,6 @@ const app = express();                        // Instancia o Express
 const port = 3000;                            // Define a porta
 
 app.use(express.json());                      // Middleware para parsing JSON
-//src/index.js
-
-app.use(express.urlencoded({ extended: true }));
 
 // Rota raiz
 app.get("/", (req, res) => {
@@ -27,3 +24,4 @@ app.listen(port, () => {
 });
 app.use(roteadorUsuario);
 app.use(roteadorLogin);
+app.use(express.urlencoded({ extended: true }));
