@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();                        // Instancia o Express
 const port = 3000;                            // Define a porta
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());                      // Middleware para parsing JSON
 
 // Rota raiz
@@ -24,4 +24,3 @@ app.listen(port, () => {
 });
 app.use(roteadorUsuario);
 app.use(roteadorLogin);
-app.use(express.urlencoded({ extended: true }));
