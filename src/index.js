@@ -1,7 +1,7 @@
 import roteadorLogin from "./routes/login.js";
 import roteadorUsuario from "./routes/usuarios.js";
 
-import cors from cors;
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 dotenv.config();
@@ -25,4 +25,4 @@ app.listen(port, () => {
 });
 app.use(roteadorUsuario);
 app.use(roteadorLogin);
-app.use(cors);
+app.use(cors());
