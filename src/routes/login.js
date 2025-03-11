@@ -4,21 +4,21 @@ import { autenticarUsuario } from "../db/index.js";
 
 const router = Router();
 
-// Middleware para verificar a autenticação do usuário
-function verificarAutenticacao(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1]; // Obtendo o token do cabeçalho
-  if (!token) {
-    return res.status(403).json({ message: "Token não fornecido!" });
-  }
+// Exemplo de código para gerar um token JWT após a autenticação do usuário
+const jwt = require('jsonwebtoken');
 
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Token inválido!" });
-    }
-    req.userId = decoded.user; // Atribuindo o ID do usuário ao request
-    next(); // Passando para o próximo middleware ou rota
-  });
-}
+router.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+  
+  // Verifique as credenciais do usuário (exemplo simplificado)
+  if (email === "f@email.com" && senha === "111") {
+    const token = jwt.sign({ userId: 1 }, 'seu-segredo-aqui', { expiresIn: '1h' });
+    res.json({ token });
+  } else {
+    res.status(401).json({ message: 'Email ou senha incorretos' });
+  }
+});
+
 
 router.get("/auth", verificarAutenticacao, async (req, res) => {
   console.log("Rota GET /auth solicitada");
