@@ -1,43 +1,49 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
-import { autenticarUsuario } from "../db/index.js"; // Certifique-se de que esse caminho está correto
-import { verificarAutenticacao } from "../middlewares/autenticacao.js"; // Se houver um middleware para verificação
+import { autenticarUsuario } from "../db/index.js";
 
 const router = Router();
 
-// Rota de login para autenticar o usuário
-router.post("/login", async (req, res) => {
-  console.log("Rota POST /login solicitada");
-  try {
-    // Verifica as credenciais do usuário
-    const usuario = await autenticarUsuario(req.body.email, req.body.senha);
-    if (usuario !== undefined) {
-      // Gera o token JWT com as informações do usuário
-      const token = jwt.sign(
-        { user: usuario.id, acesso: usuario.acesso }, 
-        process.env.SECRET, // Usando uma variável de ambiente para a chave secreta
-        { expiresIn: "1h" } // Token expira em 1 hora
-      );
-      // Retorna o token no formato JSON
-      res.status(200).json({ token });
-    } else {
-      // Caso as credenciais estejam incorretas
-      res.status(404).json({ message: "Usuário/Senha incorretos!" });
+// Middleware para verificar a autenticação do usuário
+function verificarAutenticacao(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1]; // Obtendo o token do cabeçalho
+  if (!token) {
+    return res.status(403).json({ message: "Token não fornecido!" });
+  }
+
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Token inválido!" });
     }
+    req.userId = decoded.user; // Atribuindo o ID do usuário ao request
+    next(); // Passando para o próximo middleware ou rota
+  });
+}
+
+router.get("/auth", verificarAutenticacao, async (req, res) => {
+  console.log("Rota GET /auth solicitada");
+  try {
+    res.status(200).json({ user: `${req.userId}` });
   } catch (error) {
-    // Se ocorrer um erro, retorna o erro
     res.status(error.status || 500).json({ message: error.message || "Erro!" });
   }
 });
 
-// Rota de autenticação (verifica se o token é válido)
-router.get("/auth", verificarAutenticacao, async (req, res) => {
-  console.log("Rota GET /auth solicitada");
+router.post("/login", async (req, res) => {
+  console.log("Rota POST /login solicitada");
   try {
-    // Após a autenticação, retorna o ID do usuário
-    res.status(200).json({ user: `${req.userId}` });
+    const usuario = await autenticarUsuario(req.body.email, req.body.senha);
+    if (usuario !== undefined) {
+      const token = jwt.sign(
+        { user: usuario.id, acesso: usuario.acesso },
+        process.env.SECRET,
+        { expiresIn: "1h" } // Token expira em 1 hora
+      );
+      res.status(200).json({ token: token }); // Usando status 200 para sucesso
+    } else {
+      res.status(404).json({ message: "Usuário/Senha incorreta!" });
+    }
   } catch (error) {
-    // Se ocorrer um erro, retorna o erro
     res.status(error.status || 500).json({ message: error.message || "Erro!" });
   }
 });
