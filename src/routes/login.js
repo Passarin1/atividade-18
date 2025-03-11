@@ -2,23 +2,9 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { autenticarUsuario } from "../db/index.js";
 
+import verificarAutenticacao from "../middlewares/autenticacao.js";
+
 const router = Router();
-
-// Middleware para verificar a autenticação do usuário
-function verificarAutenticacao(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1]; // Obtendo o token do cabeçalho
-  if (!token) {
-    return res.status(403).json({ message: "Token não fornecido!" });
-  }
-
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Token inválido!" });
-    }
-    req.userId = decoded.user; // Atribuindo o ID do usuário ao request
-    next(); // Passando para o próximo middleware ou rota
-  });
-}
 
 router.get("/auth", verificarAutenticacao, async (req, res) => {
   console.log("Rota GET /auth solicitada");
