@@ -10,9 +10,9 @@ dotenv.config();
 const app = express();                        // Instancia o Express
 const port = 3000;                            // Define a porta
 
+app.use(cors());  
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());  
-app.use(cors());  
 app.use(roteadorUsuario);
 app.use(roteadorLogin);
                   // Middleware para parsing JSON
